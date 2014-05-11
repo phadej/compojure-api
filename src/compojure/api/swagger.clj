@@ -6,7 +6,7 @@
             [ring.util.response :refer :all]
             [ring.swagger.core :as swagger]
             [ring.swagger.common :refer :all]
-            ring.swagger.ui
+            [ring.swagger.ui :as ui]
             [compojure.api.common :refer :all]
             [compojure.api.core :as core]
             [compojure.route :as route]
@@ -172,7 +172,16 @@
 ;; Public api
 ;;
 
-(import-vars [ring.swagger.ui swagger-ui])
+(defn swagger-ui
+  "This function wraps `swagger-ui` function from `ring-swagger` so that
+   it can be used inside compojure contexts."
+  [& body]
+  (fn [{:keys [context] :as req}]
+    ;; Modify first parameter (the path) to include compojure context path
+    ((apply ui/swagger-ui (if (string? (first body))
+                            (cons (swagger/join-paths context (first body)) (rest body))
+                            (cons context body)))
+     req)))
 
 (defn swagger-docs
   "Route to serve the swagger api-docs. If the first

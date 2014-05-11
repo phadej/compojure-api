@@ -5,4 +5,4 @@
 
 (defn -main []
   (httpkit/run-server app {:port 8080})
-  (println "server started"))
+  (println "server started, port 8080"))
